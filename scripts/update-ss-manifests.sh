@@ -110,6 +110,7 @@ while [[ $i -lt $services_length ]]; do
                     --from-literal="$k"="$(jq --arg key "$k" -r '.[$key]' "${ROOT_DIR}/infrastructure/secrets/${ss_name}.json")" \
                     -o yaml | kubeseal --controller-namespace kube-system --format yaml --merge-into "${ROOT_DIR}/infrastructure/kubernetes/${target}/${svc_namespace}/${svc_name}/${ss_name}-ss.yaml"
             done
+            ((j+=1))
         done
     fi
     info "..."
