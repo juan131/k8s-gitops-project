@@ -46,7 +46,7 @@ jobs:
           terraform validate -no-color
           terraform apply -target=module.argo_cd_argo_cd -target=module.sealed_secrets_kube_system -auto-approve
         shell: bash
-        working-directory: infrastructure/environments/staging/us-central1-a
+        working-directory: infrastructure/environments/staging
 
       - name: Create production K8s manifests
         run: |
@@ -54,7 +54,7 @@ jobs:
           terraform validate -no-color
           terraform apply -target=module.argo_cd_argo_cd -target=module.sealed_secrets_kube_system -auto-approve
         shell: bash
-        working-directory: infrastructure/environments/production/us-central1-a
+        working-directory: infrastructure/environments/production
 
       - name: Commit
         uses: EndBug/add-and-commit@v7.2.0
