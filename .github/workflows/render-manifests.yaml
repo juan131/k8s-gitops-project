@@ -25,13 +25,13 @@ jobs:
         with:
           terraform_version: 1.1.7
 
-      - name: Update chart deps
+      - name: Update local chart deps
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami >/dev/null 2>&1 || true
           helm repo update >/dev/null 2>&1 || true
-          for c in "sample-api"; do
-            helm dep build --skip-refresh "src/${c}/helm" >/dev/null 2>&1
-          done
+        # for c in "sample-api"; do
+        #   helm dep build --skip-refresh "src/${c}/helm" >/dev/null 2>&1
+        # done
         shell: bash
 
       # Terraform won't detect when is it required to remove a manifest
