@@ -1,0 +1,21 @@
+---
+# Source: argo-cd/templates/argocd-cm.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  # Mandatory hardcoded name.
+  # Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cm.yaml
+  name: argocd-cm
+  namespace: "argo-cd"
+  labels:
+    app.kubernetes.io/name: argo-cd
+    helm.sh/chart: argo-cd-3.3.4
+    app.kubernetes.io/instance: argo-cd
+    app.kubernetes.io/managed-by: Helm
+    # Mandatory label
+    # Ref: https://argoproj.github.io/argo-cd/operator-manual/declarative-setup/#atomic-configuration
+    app.kubernetes.io/part-of: argocd
+data:
+  application.instanceLabelKey: argocd.argoproj.io/instance
+  dex.config: ""
+  url: ''

@@ -1,0 +1,68 @@
+---
+# Source: argo-cd/templates/extra-list.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cd
+  namespace: argo-cd
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  description: Continuous Deployment services
+  destinations:
+  - namespace: argo-cd
+    server: https://kubernetes.default.svc
+  - namespace: kube-system
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - https://github.com/juan131/k8s-gitops-project.git
+---
+# Source: argo-cd/templates/extra-list.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-cd-argo-cd
+  namespace: argo-cd
+spec:
+  destination:
+    namespace: argo-cd
+    server: https://kubernetes.default.svc
+  project: cd
+  source:
+    directory:
+      recurse: true
+    path: infrastructure/kubernetes/staging/argo-cd/argo-cd
+    repoURL: https://github.com/juan131/k8s-gitops-project.git
+    targetRevision: staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+---
+# Source: argo-cd/templates/extra-list.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sealed-secrets-kube-system
+  namespace: argo-cd
+spec:
+  destination:
+    namespace: kube-system
+    server: https://kubernetes.default.svc
+  project: cd
+  source:
+    directory:
+      recurse: true
+    path: infrastructure/kubernetes/staging/kube-system/sealed-secrets
+    repoURL: https://github.com/juan131/k8s-gitops-project.git
+    targetRevision: staging
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground

@@ -1,0 +1,23 @@
+---
+# Source: argo-cd/templates/application-controller/clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-cd-app-controller
+  namespace: "argo-cd"
+  labels:
+    app.kubernetes.io/name: argo-cd
+    helm.sh/chart: argo-cd-3.3.4
+    app.kubernetes.io/instance: argo-cd
+    app.kubernetes.io/managed-by: Helm
+rules:
+  - apiGroups:
+      - '*'
+    resources:
+      - '*'
+    verbs:
+      - '*'
+  - nonResourceURLs:
+      - '*'
+    verbs:
+      - '*'
