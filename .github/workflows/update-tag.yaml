@@ -3,7 +3,7 @@ name: Update tag
 on:
   workflow_dispatch:
     inputs:
-      tag:
+      stage:
         description: Stage to deploy
         required: true
         default: staging
