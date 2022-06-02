@@ -1,0 +1,15 @@
+[
+    {
+        "name": "argo-cd",
+        "namespace": "argo-cd",
+        "chart-repo": "bitnami",
+        "sealed-secrets": [
+            "argocd-secret"
+        ]
+    },
+    {
+        "name": "sealed-secrets",
+        "namespace": "kube-system",
+        "chart-repo": "sealed-secrets"
+    }
+]

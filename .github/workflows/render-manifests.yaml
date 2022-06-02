@@ -1,0 +1,63 @@
+name: Render K8s manifests
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'infrastructure/environments/**/*-services.tf'
+      - 'infrastructure/environments/**/helm-values/**'
+
+jobs:
+  render-k8s-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.8.1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.7
+
+      - name: Update chart deps
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami >/dev/null 2>&1 || true
+          helm repo update >/dev/null 2>&1 || true
+          for c in "sample-api"; do
+            helm dep build --skip-refresh "src/${c}/helm" >/dev/null 2>&1
+          done
+        shell: bash
+
+      # Terraform won't detect when is it required to remove a manifest
+      - name: Remove K8s manifests
+        run: |
+          find infrastructure/kubernetes -type f -name "*.yaml" -not -name "*-ss.yaml" -exec rm {} \;
+        shell: bash
+
+      - name: Create staging K8s manifests
+        run: |
+          terraform init
+          terraform validate -no-color
+          terraform apply -target=module.argo_cd_argo_cd -target=module.sealed_secrets_kube_system -auto-approve
+        shell: bash
+        working-directory: infrastructure/environments/staging/us-central1-a
+
+      - name: Create production K8s manifests
+        run: |
+          terraform init
+          terraform validate -no-color
+          terraform apply -target=module.argo_cd_argo_cd -target=module.sealed_secrets_kube_system -auto-approve
+        shell: bash
+        working-directory: infrastructure/environments/production/us-central1-a
+
+      - name: Commit
+        uses: EndBug/add-and-commit@v7.2.0
+        with:
+          add: 'infrastructure/kubernetes'
+          message: 'fix: update K8s manifests'

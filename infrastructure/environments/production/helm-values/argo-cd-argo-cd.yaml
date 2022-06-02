@@ -1,0 +1,101 @@
+config:
+  secret:
+    create: false
+# Application Controller parameters
+controller:
+  logLevel: info
+  logFormat: json
+  metrics:
+    enabled: true
+# API Server parameters
+server:
+  logLevel: info
+  logFormat: json
+  extraArgs:
+    # We can disable authentication and disable TLS since ArgoCD is not exposed outside the cluster
+    - --disable-auth
+    - --insecure
+  metrics:
+    enabled: true
+# Repository Server parameters
+repoServer:
+  logLevel: info
+  logFormat: json
+  metrics:
+    enabled: true
+redis:
+  auth:
+    enabled: true
+    existingSecret: argocd-secret
+    existingSecretPasswordKey: redisPassword
+
+# Argo CD Applications and Projects
+extraDeploy:
+  # CD project
+  - apiVersion: argoproj.io/v1alpha1
+    kind: AppProject
+    metadata:
+      name: cd
+      namespace: argo-cd
+    spec:
+      description: "Continuous Deployment services"
+      sourceRepos:
+        - https://github.com/juan131/k8s-gitops-project.git
+      destinations:
+        - namespace: argo-cd
+          server: https://kubernetes.default.svc
+        - namespace: kube-system
+          server: https://kubernetes.default.svc
+      clusterResourceWhitelist:
+        - group: '*'
+          kind: '*'
+  - apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: argo-cd-argo-cd
+      namespace: argo-cd
+    spec:
+      project: cd
+      source:
+        repoURL: https://github.com/juan131/k8s-gitops-project.git
+        targetRevision: production
+        path: infrastructure/kubernetes/production/argo-cd/argo-cd
+        directory:
+          recurse: true
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argo-cd
+      syncPolicy:
+        automated:
+          # Delete resources when Argo CD detects the resource is no longer defined in Git
+          prune: true
+          # Enable automatic sync when the live cluster's state deviates from the state defined in Git (only for Argo CD)
+          selfHeal: true
+        syncOptions:
+          # Ensures that namespace specified as the application destination exists in the destination cluster
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+  - apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: sealed-secrets-kube-system
+      namespace: argo-cd
+    spec:
+      project: cd
+      source:
+        repoURL: https://github.com/juan131/k8s-gitops-project.git
+        targetRevision: production
+        path: infrastructure/kubernetes/production/kube-system/sealed-secrets
+        directory:
+          recurse: true
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: kube-system
+      syncPolicy:
+        automated:
+          # Delete resources when Argo CD detects the resource is no longer defined in Git
+          prune: true
+        syncOptions:
+          # Ensures that namespace specified as the application destination exists in the destination cluster
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground

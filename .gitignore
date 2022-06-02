@@ -11,5 +11,25 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# IDEs
+.vscode/
+
+# Terraform
+# Local .terraform directories
+**/.terraform/*
+# .tfstate files
+*.tfstate
+*.tfstate.*
+# Ignore override files as they are usually used to override resources locally and so
+# are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Tarballs
+*.tar.gz
+*.tgz
