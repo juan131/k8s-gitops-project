@@ -6,7 +6,7 @@ module "argo_cd_argo_cd" {
   chart_release_name      = "argo-cd"
   chart_release_namespace = "argo-cd"
   chart_values_path       = "./helm-values/argo-cd-argo-cd.yaml"
-  chart_version           = "3.4.4" # auto-updated-argo-cd
+  chart_version           = "4.0.1" # auto-updated-argo-cd
 }
 
 module "sealed_secrets_kube_system" {
@@ -17,5 +17,5 @@ module "sealed_secrets_kube_system" {
   chart_release_name      = "sealed-secrets"
   chart_release_namespace = "kube-system"
   chart_values_path       = "./helm-values/sealed-secrets-kube-system.yaml"
-  chart_version           = "2.3.0" # auto-updated-sealed-secrets
+  chart_version           = "2.4.0" # auto-updated-sealed-secrets
 }
